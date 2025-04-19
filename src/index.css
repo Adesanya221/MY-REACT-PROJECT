@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #e8f5e9;
+  background-color: #e8f5e9; /* Light green background */
 }
 
 code {
@@ -21,6 +21,11 @@ code {
 html, body {
   height: 100%;
   width: 100%;
+}
+
+/* Root styles */
+#root {
+  min-height: 100vh;
 }
 
 /* Responsive text sizing */
