@@ -1,32 +1,55 @@
-import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Container, 
-  Grid, 
-  Paper, 
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Container,
+  Grid,
+  Paper,
   Button,
   Divider
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import ProductCard from './ProductCard';
+import AuthRequiredNotification from './AuthRequiredNotification';
 import plants from '../data/plants';
 import LockIcon from '@mui/icons-material/Lock';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const CatalogView = () => {
+  // State for auth notification dialog
+  const [showAuthNotification, setShowAuthNotification] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Handle showing the auth notification
+  const handleShowAuthNotification = (product) => {
+    setSelectedProduct(product);
+    setShowAuthNotification(true);
+  };
+
+  // Handle closing the auth notification
+  const handleCloseAuthNotification = () => {
+    setShowAuthNotification(false);
+  };
   // Get unique categories
   const categories = [...new Set(plants.map(plant => plant.category))];
-  
+
   // For catalog view, we'll show a limited number of products per category
   const productsPerCategory = 4;
-  
+
   return (
-    <Container maxWidth="lg">
+    <>
+      {/* Auth Required Notification Dialog */}
+      <AuthRequiredNotification
+        open={showAuthNotification}
+        onClose={handleCloseAuthNotification}
+        productName={selectedProduct?.name}
+        redirectPath="/products"
+      />
+      <Container maxWidth="lg">
       {/* Catalog Header */}
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           mb: 5,
           animation: 'fadeIn 0.8s ease-out',
           '@keyframes fadeIn': {
@@ -35,13 +58,13 @@ const CatalogView = () => {
           }
         }}
       >
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          align="center" 
-          color="primary" 
+        <Typography
+          variant="h3"
+          component="h1"
+          align="center"
+          color="primary"
           gutterBottom
-          sx={{ 
+          sx={{
             fontWeight: 'bold',
             textShadow: '0 4px 8px rgba(0,0,0,0.1)',
             position: 'relative',
@@ -61,14 +84,14 @@ const CatalogView = () => {
         >
           Product Catalog
         </Typography>
-        
-        <Typography 
-          variant="subtitle1" 
-          align="center" 
-          color="text.secondary" 
-          sx={{ 
-            mt: 2, 
-            maxWidth: '800px', 
+
+        <Typography
+          variant="subtitle1"
+          align="center"
+          color="text.secondary"
+          sx={{
+            mt: 2,
+            maxWidth: '800px',
             mx: 'auto',
             animation: 'fadeIn 1s ease-out 0.3s both',
           }}
@@ -76,13 +99,13 @@ const CatalogView = () => {
           Browse our premium selection of cannabis products. Create an account or log in to purchase.
         </Typography>
       </Box>
-      
+
       {/* Login/Signup Call to Action */}
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          p: 4, 
-          mb: 6, 
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          mb: 6,
           borderRadius: 2,
           background: 'linear-gradient(145deg, #e8f5e9, #c8e6c9)',
           animation: 'fadeInUp 0.8s ease-out 0.2s both',
@@ -93,9 +116,9 @@ const CatalogView = () => {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
             flexGrow: 1,
             mb: { xs: 2, md: 0 }
           }}>
@@ -109,20 +132,20 @@ const CatalogView = () => {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             gap: 2,
             flexWrap: 'wrap',
             justifyContent: { xs: 'center', md: 'flex-end' },
             width: { xs: '100%', md: 'auto' }
           }}>
-            <Button 
-              component={RouterLink} 
-              to="/login" 
-              variant="contained" 
+            <Button
+              component={RouterLink}
+              to="/login"
+              variant="contained"
               color="primary"
               startIcon={<ShoppingCartIcon />}
-              sx={{ 
+              sx={{
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
@@ -136,13 +159,13 @@ const CatalogView = () => {
             >
               Log In
             </Button>
-            <Button 
-              component={RouterLink} 
-              to="/signup" 
-              variant="outlined" 
+            <Button
+              component={RouterLink}
+              to="/signup"
+              variant="outlined"
               color="secondary"
               startIcon={<PersonAddIcon />}
-              sx={{ 
+              sx={{
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
@@ -163,9 +186,9 @@ const CatalogView = () => {
 
       {/* Product Categories */}
       {categories.map((category, index) => (
-        <Box 
-          key={category} 
-          sx={{ 
+        <Box
+          key={category}
+          sx={{
             mb: 6,
             animation: 'fadeInUp 0.8s ease-out',
             animationFillMode: 'both',
@@ -214,17 +237,21 @@ const CatalogView = () => {
               .slice(0, productsPerCategory)
               .map(plant => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={plant.id}>
-                  <ProductCard plant={plant} catalogMode={true} />
+                  <ProductCard
+                    plant={plant}
+                    catalogMode={true}
+                    onClick={() => handleShowAuthNotification(plant)}
+                  />
                 </Grid>
               ))
             }
           </Grid>
-          
+
           {/* "See More" section at the end of each category */}
           {plants.filter(plant => plant.category === category).length > productsPerCategory && (
-            <Box 
-              sx={{ 
-                mt: 3, 
+            <Box
+              sx={{
+                mt: 3,
                 textAlign: 'center',
                 p: 2,
                 borderRadius: 2,
@@ -235,12 +262,12 @@ const CatalogView = () => {
               <Typography variant="body1" color="text.secondary" gutterBottom>
                 {plants.filter(plant => plant.category === category).length - productsPerCategory} more products available in this category
               </Typography>
-              <Button 
-                component={RouterLink} 
-                to="/login?redirect=/products" 
-                variant="outlined" 
+              <Button
+                component={RouterLink}
+                to="/login?redirect=/products"
+                variant="outlined"
                 color="primary"
-                sx={{ 
+                sx={{
                   mt: 1,
                   fontWeight: 'bold',
                   transition: 'all 0.3s ease',
@@ -256,13 +283,13 @@ const CatalogView = () => {
           )}
         </Box>
       ))}
-      
+
       {/* Bottom Call to Action */}
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          p: 4, 
-          mb: 6, 
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          mb: 6,
           borderRadius: 2,
           textAlign: 'center',
           background: 'linear-gradient(145deg, #e8f5e9, #c8e6c9)',
@@ -276,13 +303,13 @@ const CatalogView = () => {
           Create an account to access our full product catalog, make purchases, and track your orders.
         </Typography>
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
-          <Button 
-            component={RouterLink} 
-            to="/login" 
-            variant="contained" 
+          <Button
+            component={RouterLink}
+            to="/login"
+            variant="contained"
             color="primary"
             size="large"
-            sx={{ 
+            sx={{
               px: 4,
               py: 1.5,
               fontWeight: 'bold',
@@ -296,13 +323,13 @@ const CatalogView = () => {
           >
             Log In
           </Button>
-          <Button 
-            component={RouterLink} 
-            to="/signup" 
-            variant="outlined" 
+          <Button
+            component={RouterLink}
+            to="/signup"
+            variant="outlined"
             color="secondary"
             size="large"
-            sx={{ 
+            sx={{
               px: 4,
               py: 1.5,
               fontWeight: 'bold',
@@ -319,7 +346,8 @@ const CatalogView = () => {
           </Button>
         </Box>
       </Paper>
-    </Container>
+      </Container>
+    </>
   );
 };
 

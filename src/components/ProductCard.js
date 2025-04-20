@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import AuthRequiredNotification from './AuthRequiredNotification';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -15,13 +16,16 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 
-const ProductCard = ({ plant, catalogMode = false }) => {
+const ProductCard = ({ plant, catalogMode = false, onClick }) => {
   const { cartItems, addToCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Check if this plant is already in the cart
   const isInCart = cartItems.some(item => item.id === plant.id);
+
+  // State for auth notification dialog
+  const [showAuthNotification, setShowAuthNotification] = useState(false);
 
   // Check if user is authenticated
   const userIsAuthenticated = isAuthenticated();
@@ -30,14 +34,31 @@ const ProductCard = ({ plant, catalogMode = false }) => {
   const handleAddToCart = () => {
     if (userIsAuthenticated) {
       addToCart(plant);
+    } else if (catalogMode && onClick) {
+      // If in catalog mode and onClick handler is provided, use that
+      onClick(plant);
     } else {
-      navigate('/login?redirect=/products');
+      // Show auth required notification instead of direct navigation
+      setShowAuthNotification(true);
     }
   };
 
+  // Handle closing the auth notification
+  const handleCloseAuthNotification = () => {
+    setShowAuthNotification(false);
+  };
+
   return (
-    <Card
-      sx={{
+    <>
+      {/* Auth Required Notification Dialog */}
+      <AuthRequiredNotification
+        open={showAuthNotification}
+        onClose={handleCloseAuthNotification}
+        productName={plant.name}
+        redirectPath="/products"
+      />
+      <Card
+        sx={{
         width: '100%',
         height: '100%',
         display: 'flex',
@@ -210,7 +231,8 @@ const ProductCard = ({ plant, catalogMode = false }) => {
           {isInCart ? 'Added to Cart' : (!userIsAuthenticated ? 'Login to Add' : 'Add to Cart')}
         </Button>
       </CardActions>
-    </Card>
+      </Card>
+    </>
   );
 };
 
