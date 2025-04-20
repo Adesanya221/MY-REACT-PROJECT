@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   Box,
   Container,
@@ -89,6 +91,14 @@ const Signup = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { signup, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get redirect path from URL query params
+  const searchParams = new URLSearchParams(location.search);
+  const redirectPath = searchParams.get('redirect') || '/';
 
   // Form fields
   const [formData, setFormData] = useState({
@@ -199,15 +209,31 @@ const Signup = () => {
     setError('');
   };
 
-  const handleSubmit = () => {
+  // Check if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate(redirectPath);
+    }
+  }, [isAuthenticated, navigate, redirectPath]);
+
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Call signup function from auth context
+      await signup(
+        `${formData.firstName} ${formData.lastName}`,
+        formData.email,
+        formData.password
+      );
+
       console.log('Form submitted with:', formData);
       setIsSubmitting(false);
       setActiveStep(3); // Success step
-    }, 1500);
+    } catch (error) {
+      setError(error.message || 'Failed to create account. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   // Step content

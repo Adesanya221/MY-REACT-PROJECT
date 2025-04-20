@@ -8,9 +8,12 @@ import Container from '@mui/material/Container';
 
 
 
-const Products = () => {
+const Products = ({ previewMode = false, previewCount = 2 }) => {
   // Get unique categories
   const categories = [...new Set(plants.map(plant => plant.category))];
+
+  // If in preview mode, only show a limited number of products
+  const displayedCategories = previewMode ? categories.slice(0, 1) : categories;
 
 
   return (
@@ -66,7 +69,7 @@ const Products = () => {
         Our Plants Collection
       </Typography>
 
-      {categories.map((category, index) => (
+      {displayedCategories.map((category, index) => (
         <Box
           key={category}
           sx={{
@@ -121,6 +124,7 @@ const Products = () => {
           <Grid container spacing={3}>
             {plants
               .filter(plant => plant.category === category)
+              .slice(0, previewMode ? previewCount : undefined)
               .map(plant => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={plant.id}>
                   <ProductCard plant={plant} />

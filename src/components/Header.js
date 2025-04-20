@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -27,8 +28,11 @@ const glow = keyframes`
 
 const Header = () => {
   const { getTotalItems } = useCart();
+  const { currentUser, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -36,6 +40,20 @@ const Header = () => {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    handleCloseUserMenu();
+    navigate('/');
   };
 
   const pages = [
@@ -168,33 +186,62 @@ const Header = () => {
               width: '90%',
               mx: 'auto'
             }} />
-            {authPages.map((page) => (
+            {!isAuthenticated() ? (
+              // Show login/signup buttons if not authenticated
+              authPages.map((page) => (
+                <MenuItem
+                  key={page.name}
+                  onClick={handleCloseNavMenu}
+                  component={RouterLink}
+                  to={page.path}
+                  sx={{
+                    py: 1.5,
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      bgcolor: page.name === 'Sign Up' ? 'rgba(255, 193, 7, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+                    }
+                  }}
+                >
+                  <Typography
+                    textAlign="center"
+                    sx={{
+                      color: page.name === 'Sign Up' ? 'secondary.main' : 'inherit',
+                      fontWeight: page.name === 'Sign Up' ? 'bold' : 500,
+                      transition: 'all 0.2s ease',
+                      '&:hover': { pl: 0.5 }
+                    }}
+                  >
+                    {page.name}
+                  </Typography>
+                </MenuItem>
+              ))
+            ) : (
+              // Show logout button if authenticated
               <MenuItem
-                key={page.name}
-                onClick={handleCloseNavMenu}
-                component={RouterLink}
-                to={page.path}
+                onClick={() => {
+                  handleCloseNavMenu();
+                  handleLogout();
+                }}
                 sx={{
                   py: 1.5,
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    bgcolor: page.name === 'Sign Up' ? 'rgba(255, 193, 7, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+                    bgcolor: 'rgba(76, 175, 80, 0.1)',
                   }
                 }}
               >
                 <Typography
                   textAlign="center"
                   sx={{
-                    color: page.name === 'Sign Up' ? 'secondary.main' : 'inherit',
-                    fontWeight: page.name === 'Sign Up' ? 'bold' : 500,
+                    fontWeight: 500,
                     transition: 'all 0.2s ease',
                     '&:hover': { pl: 0.5 }
                   }}
                 >
-                  {page.name}
+                  Logout
                 </Typography>
               </MenuItem>
-            ))}
+            )}
           </Menu>
 
           {/* Empty middle section to push content to sides */}
@@ -229,28 +276,48 @@ const Header = () => {
                 </Button>
               ))}
 
-              {authPages.map((page) => (
+              {!isAuthenticated() ? (
+                // Show login/signup buttons if not authenticated
+                authPages.map((page) => (
+                  <Button
+                    key={page.name}
+                    component={RouterLink}
+                    to={page.path}
+                    onClick={handleCloseNavMenu}
+                    sx={{
+                      mx: 1,
+                      my: 2,
+                      color: page.name === 'Sign Up' ? 'secondary.main' : 'white',
+                      fontWeight: page.name === 'Sign Up' ? 'bold' : 'normal',
+                      border: page.name === 'Sign Up' ? 1 : 0,
+                      borderColor: 'secondary.main',
+                      '&:hover': {
+                        bgcolor: page.name === 'Sign Up' ? 'secondary.main' : 'rgba(255,255,255,0.1)',
+                        color: page.name === 'Sign Up' ? 'white' : 'white',
+                      }
+                    }}
+                  >
+                    {page.name}
+                  </Button>
+                ))
+              ) : (
+                // Show user info and logout button if authenticated
                 <Button
-                  key={page.name}
-                  component={RouterLink}
-                  to={page.path}
-                  onClick={handleCloseNavMenu}
+                  onClick={handleLogout}
                   sx={{
                     mx: 1,
                     my: 2,
-                    color: page.name === 'Sign Up' ? 'secondary.main' : 'white',
-                    fontWeight: page.name === 'Sign Up' ? 'bold' : 'normal',
-                    border: page.name === 'Sign Up' ? 1 : 0,
-                    borderColor: 'secondary.main',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
                     '&:hover': {
-                      bgcolor: page.name === 'Sign Up' ? 'secondary.main' : 'rgba(255,255,255,0.1)',
-                      color: page.name === 'Sign Up' ? 'white' : 'white',
+                      bgcolor: 'rgba(255,255,255,0.1)',
                     }
                   }}
                 >
-                  {page.name}
+                  Logout
                 </Button>
-              ))}
+              )}
             </Box>
 
             {/* Mobile Menu Button (Moved from left section) */}

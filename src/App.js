@@ -19,6 +19,8 @@ import Contact from './pages/Contact';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import AnimatedBackground from './components/AnimatedBackground';
 import theme from './theme';
 
@@ -27,7 +29,8 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <CartProvider>
+        <AuthProvider>
+          <CartProvider>
           <Box className="App" sx={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             {/* Animated background with random cannabis leaves */}
             <AnimatedBackground
@@ -45,8 +48,27 @@ function App() {
             <Container component="main" maxWidth="lg" sx={{ py: 2, position: 'relative', zIndex: 1, flexGrow: 1 }}>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/cart" element={<Cart />} />
+                <Route path="/products" element={
+                  <ProtectedRoute limitedContent={
+                    <Box sx={{ textAlign: 'center', py: 4 }}>
+                      <Typography variant="h4" gutterBottom color="primary" sx={{ fontWeight: 'bold' }}>
+                        Our Featured Products
+                      </Typography>
+                      <Typography variant="body1" paragraph>
+                        Browse our selection of premium cannabis products. Sign in to see our full catalog and make purchases.
+                      </Typography>
+                      {/* Show only 2 products as preview */}
+                      <Products previewMode={true} previewCount={2} />
+                    </Box>
+                  }>
+                    <Products />
+                  </ProtectedRoute>
+                } />
+                <Route path="/cart" element={
+                  <ProtectedRoute>
+                    <Cart />
+                  </ProtectedRoute>
+                } />
                 <Route path="/about" element={<About />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
@@ -61,7 +83,8 @@ function App() {
             {/* Footer with animated green waves */}
             <Footer />
           </Box>
-        </CartProvider>
+          </CartProvider>
+        </AuthProvider>
       </Router>
     </ThemeProvider>
   );

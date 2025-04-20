@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   Box,
   Container,
@@ -49,16 +51,33 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('user@example.com'); // Pre-filled for demo
+  const [password, setPassword] = useState('password'); // Pre-filled for demo
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get redirect path from URL query params
+  const searchParams = new URLSearchParams(location.search);
+  const redirectPath = searchParams.get('redirect') || '/';
+
+  // Check if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate(redirectPath);
+    }
+  }, [isAuthenticated, navigate, redirectPath]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
     setIsSubmitting(true);
 
     // Validate form
@@ -76,15 +95,20 @@ const Login = () => {
       return;
     }
 
-    // Simulate login process
-    setTimeout(() => {
-      // In a real app, you would call your authentication API here
-      console.log('Login attempt with:', { email, password, rememberMe });
+    try {
+      // Attempt to login
+      await login(email, password);
+      setSuccess(true);
 
-      // For demo purposes, always succeed
+      // Redirect after successful login
+      setTimeout(() => {
+        navigate(redirectPath);
+      }, 1000);
+    } catch (error) {
+      setError(error.message || 'Failed to log in. Please check your credentials.');
+    } finally {
       setIsSubmitting(false);
-      // Redirect would happen here after successful login
-    }, 1500);
+    }
   };
 
   return (
@@ -110,6 +134,12 @@ const Login = () => {
             {error && (
               <Alert severity="error" sx={{ width: '100%', mb: 3 }}>
                 {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert severity="success" sx={{ width: '100%', mb: 3 }}>
+                Login successful! Redirecting...
               </Alert>
             )}
 
