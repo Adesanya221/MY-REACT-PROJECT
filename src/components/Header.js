@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import AuthRequiredNotification from './AuthRequiredNotification';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -33,6 +34,7 @@ const Header = () => {
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [showAuthNotification, setShowAuthNotification] = useState(false);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -69,7 +71,20 @@ const Header = () => {
     { name: 'Sign Up', path: '/signup' },
   ];
 
+  // Handle closing the auth notification
+  const handleCloseAuthNotification = () => {
+    setShowAuthNotification(false);
+  };
+
   return (
+    <>
+      {/* Auth Required Notification Dialog */}
+      <AuthRequiredNotification
+        open={showAuthNotification}
+        onClose={handleCloseAuthNotification}
+        productName=""
+        redirectPath="/cart"
+      />
     <AppBar
       position="static"
       sx={{
@@ -352,8 +367,13 @@ const Header = () => {
             {/* Cart Icon */}
             <Box>
               <IconButton
-                component={RouterLink}
-                to="/cart"
+                component={isAuthenticated() ? RouterLink : 'button'}
+                to={isAuthenticated() ? "/cart" : undefined}
+                onClick={() => {
+                  if (!isAuthenticated()) {
+                    setShowAuthNotification(true);
+                  }
+                }}
                 aria-label="cart"
                 sx={{
                   color: 'white',
@@ -391,6 +411,7 @@ const Header = () => {
         </Toolbar>
       </Box>
     </AppBar>
+    </>
   );
 };
 
