@@ -66,13 +66,16 @@ const Newsletter = () => {
           sx={{
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: 1,
+            gap: { xs: 2, sm: 1 },
             width: { xs: '100%', md: '50%' },
-            alignItems: 'stretch'
+            alignItems: 'stretch',
+            '& > *': { // Apply to all direct children
+              flex: { xs: '1 1 auto', sm: 'unset' } // Full width on mobile
+            }
           }}
         >
           <TextField
-            label="Your Email"
+            placeholder="Enter your email address"
             variant="outlined"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -81,6 +84,14 @@ const Newsletter = () => {
             fullWidth
             InputProps={{
               startAdornment: <MailOutlineIcon sx={{ mr: 1, color: 'primary.main' }} />,
+              sx: {
+                height: '56px', // Ensure consistent height
+                pl: 1.5, // Add left padding for better text positioning
+                '&::placeholder': {
+                  opacity: 1, // Make placeholder more visible
+                  verticalAlign: 'middle', // Center vertically
+                }
+              }
             }}
             sx={{
               bgcolor: 'white',
@@ -90,6 +101,15 @@ const Newsletter = () => {
                   borderColor: 'primary.light',
                 },
               },
+              '& .MuiOutlinedInput-input': {
+                paddingLeft: '0.5rem', // Fine-tune text position
+                verticalAlign: 'middle', // Center text vertically
+              },
+              '& .MuiInputBase-input::placeholder': {
+                opacity: 0.7,
+                color: 'text.secondary',
+                verticalAlign: 'middle',
+              }
             }}
           />
           <Button
@@ -100,9 +120,14 @@ const Newsletter = () => {
               color: 'primary.main',
               fontWeight: 'bold',
               px: 3,
+              height: '56px', // Match input field height
+              boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
               '&:hover': {
                 bgcolor: 'secondary.light',
-              }
+                transform: 'translateY(-2px)',
+                boxShadow: '0 6px 12px rgba(0,0,0,0.2)'
+              },
+              transition: 'all 0.3s ease'
             }}
           >
             Subscribe
