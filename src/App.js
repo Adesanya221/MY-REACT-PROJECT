@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import Header from './components/Header';
+import HeaderSpacer from './components/HeaderSpacer';
 import Footer from './components/Footer';
 
 import Home from './pages/Home';
@@ -44,6 +45,7 @@ function App() {
 
             {/* Header with animated logo */}
             <Header />
+            <HeaderSpacer />
 
             {/* Main content */}
             <Container component="main" maxWidth="lg" sx={{ py: 2, position: 'relative', zIndex: 1, flexGrow: 1 }}>

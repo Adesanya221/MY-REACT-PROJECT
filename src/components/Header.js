@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import AuthRequiredNotification from './AuthRequiredNotification';
@@ -27,14 +27,31 @@ const glow = keyframes`
   100% { box-shadow: 0 0 10px rgba(129, 199, 132, 0.2); }
 `;
 
+// Pages where the header should not be fixed
+const NON_FIXED_HEADER_PATHS = [
+  '/login',
+  '/signup'
+];
+
 const Header = () => {
   const { getTotalItems } = useCart();
-  const { currentUser, logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Determine if the header should be fixed based on current path
+  const [isFixed, setIsFixed] = useState(true);
+
+  // State for menu and notifications
   const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [anchorElUser] = useState(null);
   const [showAuthNotification, setShowAuthNotification] = useState(false);
+
+  // Update fixed state based on current path
+  useEffect(() => {
+    const shouldBeFixed = !NON_FIXED_HEADER_PATHS.includes(location.pathname);
+    setIsFixed(shouldBeFixed);
+  }, [location.pathname]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -44,17 +61,9 @@ const Header = () => {
     setAnchorElNav(null);
   };
 
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
   const handleLogout = async () => {
     await logout();
-    handleCloseUserMenu();
+    handleCloseNavMenu();
     navigate('/');
   };
 
@@ -86,12 +95,13 @@ const Header = () => {
         redirectPath="/cart"
       />
     <AppBar
-      position="static"
+      position={isFixed ? "fixed" : "static"}
       sx={{
         mb: 2,
         background: 'linear-gradient(90deg, #1B5E20 0%, #2E7D32 100%)',
         animation: `${glow} 5s infinite ease-in-out`,
-        position: 'relative',
+        width: '100%',
+        zIndex: (theme) => theme.zIndex.drawer + 1,
         '&::after': {
           content: '""',
           position: 'absolute',
