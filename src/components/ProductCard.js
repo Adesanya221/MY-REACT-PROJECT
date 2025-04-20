@@ -1,5 +1,7 @@
 import React from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -13,11 +15,25 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 
-const ProductCard = ({ plant }) => {
+const ProductCard = ({ plant, catalogMode = false }) => {
   const { cartItems, addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   // Check if this plant is already in the cart
   const isInCart = cartItems.some(item => item.id === plant.id);
+
+  // Check if user is authenticated
+  const userIsAuthenticated = isAuthenticated();
+
+  // Handle add to cart with authentication check
+  const handleAddToCart = () => {
+    if (userIsAuthenticated) {
+      addToCart(plant);
+    } else {
+      navigate('/login?redirect=/products');
+    }
+  };
 
   return (
     <Card
@@ -171,17 +187,17 @@ const ProductCard = ({ plant }) => {
           variant="contained"
           color="primary"
           fullWidth
-          onClick={() => addToCart(plant)}
-          disabled={isInCart}
+          onClick={handleAddToCart}
+          disabled={isInCart || catalogMode}
           startIcon={isInCart ? <CheckCircleIcon /> : <AddShoppingCartIcon />}
           sx={{
             py: 1,
             fontWeight: isInCart ? 'normal' : 'bold',
-            bgcolor: isInCart ? 'success.main' : 'primary.main',
+            bgcolor: isInCart ? 'success.main' : (!userIsAuthenticated ? 'secondary.main' : 'primary.main'),
             boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
             transition: 'all 0.3s ease',
             '&:hover': {
-              bgcolor: isInCart ? 'success.dark' : 'primary.dark',
+              bgcolor: isInCart ? 'success.dark' : (!userIsAuthenticated ? 'secondary.dark' : 'primary.dark'),
               transform: 'translateY(-2px)',
               boxShadow: '0 6px 12px rgba(0,0,0,0.2)'
             },
@@ -191,7 +207,7 @@ const ProductCard = ({ plant }) => {
             }
           }}
         >
-          {isInCart ? 'Added to Cart' : 'Add to Cart'}
+          {isInCart ? 'Added to Cart' : (!userIsAuthenticated ? 'Login to Add' : 'Add to Cart')}
         </Button>
       </CardActions>
     </Card>

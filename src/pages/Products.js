@@ -1,14 +1,24 @@
 import React from 'react';
 import ProductCard from '../components/ProductCard';
 import plants from '../data/plants';
+import CatalogView from '../components/CatalogView';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
+import { useAuth } from '../context/AuthContext';
 
 
 
 const Products = ({ previewMode = false, previewCount = 2 }) => {
+  const { isAuthenticated } = useAuth();
+  const userIsAuthenticated = isAuthenticated();
+
+  // If user is not authenticated and not in preview mode, show catalog view
+  if (!userIsAuthenticated && !previewMode) {
+    return <CatalogView />;
+  }
+
   // Get unique categories
   const categories = [...new Set(plants.map(plant => plant.category))];
 

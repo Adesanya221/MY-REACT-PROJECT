@@ -49,22 +49,7 @@ function App() {
             <Container component="main" maxWidth="lg" sx={{ py: 2, position: 'relative', zIndex: 1, flexGrow: 1 }}>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/products" element={
-                  <ProtectedRoute limitedContent={
-                    <Box sx={{ textAlign: 'center', py: 4 }}>
-                      <Typography variant="h4" gutterBottom color="primary" sx={{ fontWeight: 'bold' }}>
-                        Our Featured Products
-                      </Typography>
-                      <Typography variant="body1" paragraph>
-                        Browse our selection of premium cannabis products. Sign in to see our full catalog and make purchases.
-                      </Typography>
-                      {/* Show only 2 products as preview */}
-                      <Products previewMode={true} previewCount={2} />
-                    </Box>
-                  }>
-                    <Products />
-                  </ProtectedRoute>
-                } />
+                <Route path="/products" element={<Products />} />
                 <Route path="/cart" element={
                   <ProtectedRoute>
                     <Cart />
