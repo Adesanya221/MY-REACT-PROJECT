@@ -5,8 +5,7 @@ import {
   Container,
   Grid,
   Paper,
-  Button,
-  Divider
+  Button
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import ProductCard from './ProductCard';

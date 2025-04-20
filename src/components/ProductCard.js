@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import AuthRequiredNotification from './AuthRequiredNotification';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -19,7 +18,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 const ProductCard = ({ plant, catalogMode = false, onClick }) => {
   const { cartItems, addToCart } = useCart();
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
 
   // Check if this plant is already in the cart
   const isInCart = cartItems.some(item => item.id === plant.id);
