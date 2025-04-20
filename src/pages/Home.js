@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { keyframes } from '@mui/system';
+import HealthWarningBanner from '../components/HealthWarningBanner';
 
 // Enhanced custom components
 import EnhancedHeroCarousel from '../components/EnhancedHeroCarousel';
@@ -36,6 +37,9 @@ const Home = () => {
       backgroundSize: '400% 400%',
       animation: `${gradientShift} 15s ease infinite`,
     }}>
+      {/* Health Warning Banner */}
+      <HealthWarningBanner />
+
       {/* Enhanced Hero Carousel Section */}
       <EnhancedHeroCarousel />
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import AuthRequiredNotification from './AuthRequiredNotification';
+import HealthWarning from './HealthWarning';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -135,34 +136,38 @@ const ProductCard = ({ plant, catalogMode = false, onClick }) => {
         }
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-          <Typography
-            gutterBottom
-            variant="h6"
-            component="div"
-            sx={{
-              fontWeight: 'bold',
-              mb: 0,
-              position: 'relative',
-              display: 'inline-block',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -2,
-                left: 0,
-                width: '30%',
-                height: '2px',
-                background: 'linear-gradient(90deg, #4CAF50, transparent)',
-                transition: 'width 0.3s ease',
-                opacity: 0.7,
-                borderRadius: '1px'
-              },
-              '&:hover::after': {
-                width: '70%'
-              }
-            }}
-          >
-            {plant.name}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography
+              gutterBottom
+              variant="h6"
+              component="div"
+              sx={{
+                fontWeight: 'bold',
+                mb: 0,
+                position: 'relative',
+                display: 'inline-block',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -2,
+                  left: 0,
+                  width: '30%',
+                  height: '2px',
+                  background: 'linear-gradient(90deg, #4CAF50, transparent)',
+                  transition: 'width 0.3s ease',
+                  opacity: 0.7,
+                  borderRadius: '1px'
+                },
+                '&:hover::after': {
+                  width: '70%'
+                }
+              }}
+            >
+              {plant.name}
+            </Typography>
+            {/* Health warning icon */}
+            {plant.category === 'Flowers' && <HealthWarning />}
+          </Box>
           <Typography variant="h6" color="primary" fontWeight="bold">
             ${plant.price.toFixed(2)}
           </Typography>

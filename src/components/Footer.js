@@ -260,8 +260,11 @@ const Footer = () => {
             width: '100%',
           }}
         >
-          <Typography variant="caption" sx={{ opacity: 0.7 }}>
+          <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mb: 0.5 }}>
             © {new Date().getFullYear()} GreenThumb Cannabis. All rights reserved. For adults 21+ only.
+          </Typography>
+          <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', fontSize: '0.65rem', maxWidth: '800px', mx: 'auto' }}>
+            WARNING: Smoking cannabis products can expose you to chemicals that are known to cause cancer and may increase your risk of dying young. For more information about the health risks, please consult with a healthcare professional.
           </Typography>
         </Box>
       </Box>
